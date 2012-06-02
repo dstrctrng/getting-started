@@ -10,3 +10,12 @@
 [submodule ".cue"]
 	path = .cue
 	url = https://github.com/HeSYINUvSBZfxqA/cue
+[submodule ".macports"]
+	path = .macports
+	url = https://github.com/HeSYINUvSBZfxqA/macports
+[submodule ".ubuntu"]
+	path = .ubuntu
+	url = https://github.com/HeSYINUvSBZfxqA/ubuntu
+[submodule ".vault"]
+	path = .vault
+	url = https://github.com/HeSYINUvSBZfxqA/vault
