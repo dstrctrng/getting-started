@@ -1,0 +1,97 @@
+#!/bin/bash
+
+#/ NAME
+#/     setup -- one time setup for pancake
+#/
+#/ SYNOPSIS
+#/     setup pancake [shared_user]
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
+function main {
+  if [[ "$#" < 1 ]]; then
+    logger_fatal "missing component(s)"
+    exit 1
+  fi
+
+  nm_component="$1"; shift
+
+  case "$nm_component" in 
+    pancake)
+      setup_pancake "$@"
+      ;;
+    *)
+      logger_fatal "dont know how to setup $nm_component"
+      exit 1
+      ;;
+  esac
+}
+
+function osx_useradd {
+  local nm_user=$1; shift
+  local id_user=$1; shift
+
+  local pth_user="/Users/$nm_user"
+
+  sudo dscl . -create $pth_user
+  sudo dscl . -create $pth_user UserShell /bin/bash
+  sudo dscl . -create $pth_user UniqueID $id_user
+  sudo dscl . -create $pth_user PrimaryGroupID "$FLAGS_groupid"
+  sudo dscl . -create $pth_user NFSHomeDirectory $pth_user
+  sudo mkdir -p $pth_user
+}
+
+function setup_pancake {
+  if [[ "$#" < 1 ]]; then
+    logger_fatal "missing shared username"
+    exit 1
+  fi
+
+  local nm_shared=$1; shift
+
+  local pth_shared="/Users/$nm_shared"
+
+  osx_useradd $nm_shared "$FLAGS_userid"
+
+  if [[ ! -d $pth_shared/.git ]]; then
+    sudo git clone --recurse-submodules "$FLAGS_repo" $pth_shared
+  fi
+
+  if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
+    sudo ln -nfs $pth_shared/.macports /opt
+  fi
+
+  if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
+    sudo rsync -ia --no-group --no-owner --delete vault/. $pth_shared/vault/
+  fi
+
+  sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared
+
+  sudo su - $nm_shared -c "git pull"
+  sudo su - $nm_shared -c "git submodule update --init --recursive"
+
+  if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
+    sudo xcode-'select' -switch /Applications/Xcode.app
+    sudo su - $nm_shared -c "bin/build pancake"
+  fi
+}
+
+# define command line options:
+#   var name, default, description, short option
+DEFINE_boolean 'macports' "$FLAGS_TRUE" 'install macports packages' 'm'
+DEFINE_integer 'userid' "502" 'user id' 'u'
+DEFINE_integer 'groupid' "20" 'group id' 'g'
+DEFINE_string 'repo' "https://github.com/HeSYINUvSBZfxqA/pancake-normal" 'home repo' 'r'
+
+# parse the command-line
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
+# pass arguments to entry point
+main "$@"
+
