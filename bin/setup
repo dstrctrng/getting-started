@@ -41,8 +41,10 @@ function osx_useradd {
   sudo dscl . -create $pth_user
   sudo dscl . -create $pth_user UserShell /bin/bash
   sudo dscl . -create $pth_user UniqueID $id_user
+  sudo dscl . -create $pth_user ReadlName $id_user
   sudo dscl . -create $pth_user PrimaryGroupID "$FLAGS_groupid"
   sudo dscl . -create $pth_user NFSHomeDirectory $pth_user
+  sudo dscl . -password $pth_user buddhy
   sudo mkdir -p $pth_user
 }
 
