@@ -58,7 +58,7 @@ function main {
 }
 
 function build_macports {
-  ln -nfs ../vault $shome/.macports/
+  ln -nfs $shome/vault $shome/.macports/
 
   cd $shome/.macports
   bin/setup macports
@@ -67,7 +67,7 @@ function build_macports {
 }
 
 function build_ubuntu {
-  ln -nfs ../vault $shome/.ubuntu/
+  ln -nfs $shome/vault $shome/.ubuntu/
 
   cd $shome/.ubuntu
   bundle exec vagrant box add destructuring boxes/destructuring.box || true # TODO
