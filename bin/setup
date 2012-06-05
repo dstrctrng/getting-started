@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #/ NAME
-#/     setup -- one time setup for pancake
+#/     setup -- create users with pancakes
 #/
 #/ SYNOPSIS
-#/     setup pancake [shared_user]
+#/     setup user [name]
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
@@ -22,8 +22,8 @@ function main {
   nm_component="$1"; shift
 
   case "$nm_component" in 
-    pancake)
-      setup_pancake "$@"
+    user)
+      setup_user "$@"
       ;;
     *)
       logger_fatal "dont know how to setup $nm_component"
@@ -46,7 +46,7 @@ function osx_useradd {
   sudo mkdir -p $pth_user
 }
 
-function setup_pancake {
+function setup_user {
   if [[ "$#" < 1 ]]; then
     logger_fatal "missing shared username"
     exit 1
@@ -72,7 +72,7 @@ function setup_pancake {
 
   sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared
 
-  if [[ ! -d $pth_shared/.git ]]; then
+  if [[ -d $pth_shared/.git ]]; then
     sudo su - $nm_shared -c "git pull"
     sudo su - $nm_shared -c "git submodule update --init --recursive"
   fi

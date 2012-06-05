@@ -99,6 +99,8 @@ function build_ruby {
   export CC="$MACPORTS_ROOT/local/bin/gcc"
   $shome/bin/rvm-run rvm $install_cmd 1.9.3 --with-opt-dir=$MACPORTS_ROOT/local
   unset CC
+
+  $shome/bin/rvm-run rvm ree --default
 }
 
 function build_rbenv {
