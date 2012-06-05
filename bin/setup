@@ -60,6 +60,10 @@ function setup_user {
 
   if [[ ! -d $pth_shared/.git && -n "$FLAGS_repo" ]]; then
     sudo git clone --recurse-submodules "$FLAGS_repo" $pth_shared
+  else
+    if [[ ! -d $pth_shared/.getting-started ]]; then
+      git clone 'https://github.com/HeSYINUvSBZfxqA' $pth_shared/.getting-started
+    fi
   fi
 
   if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
@@ -75,19 +79,22 @@ function setup_user {
   if [[ -d $pth_shared/.git ]]; then
     sudo su - $nm_shared -c "git pull"
     sudo su - $nm_shared -c "git submodule update --init --recursive"
+  else
+    sudo su - $nm_shared -c "cd .getting-started; git pull"
+    sudo su - $nm_shared -c "cd .getting-started; git submodule update --init --recursive"
   fi
 
   if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
     sudo xcode-'select' -switch /Applications/Xcode.app
-    sudo su - $nm_shared -c "bin/build pancake"
+    sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build macports"
   fi
 
   if [[ "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
-    sudo su - $nm_shared -c "source .bash_profile; bin/build ubuntu"
+    sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build ubuntu"
   fi
 
   if [[ "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
-    sudo su - $nm_shared -c "source .bash_profile; bin/build ruby"
+    sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build ruby"
   fi
 }
 
