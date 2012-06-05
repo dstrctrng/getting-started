@@ -58,23 +58,36 @@ function main {
 }
 
 function build_macports {
+  local shome=$HOME
+  pushd $shome
+
   ln -nfs $shome/vault $shome/.macports/
 
   cd $shome/.macports
   bin/setup macports
   bin/build macports
   bin/build ports
+
+  popd
 }
 
 function build_ubuntu {
+  local shome=$HOME
+  pushd $shome
+
   ln -nfs $shome/vault $shome/.ubuntu/
 
   cd $shome/.ubuntu
   bundle exec vagrant box add destructuring boxes/destructuring.box || true # TODO
   bin/instance --ip 192.168.88.101 dev1 destructuring
+
+  popd
 }
 
 function build_ruby {
+  local shome=$HOME
+  pushd $shome
+
   export CFLAGS="-O2 -arch x86_64"
   export LDFLAGS="-L$MACPORTS_ROOT/local/lib"
   export CPPFLAGS="-I$MACPORTS_ROOT/local/include"
@@ -101,29 +114,54 @@ function build_ruby {
   unset CC
 
   $shome/bin/rvm-run rvm ree --default
+
+  popd
 }
 
 function build_rbenv {
+  local shome=$HOME
+  pushd $shome
+
   git clone https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
   logger_info "to activate cue, source .rbenv/.profile, after rvm if used"
+
+  popd
 }
 
 function build_junas {
+  local shome=$HOME
+  pushd $shome
+
   git clone https://github.com/HeSYINUvSBZfxqA/junas .junas
   logger_info "to activate junas, symlink .vim to .junas, copy .junas/vimrc.example to .vimrc"
+
+  popd
 }
 
 function build_hubflow {
+  local shome=$HOME
+  pushd $shome
+
   git clone https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
   logger_info "to activate cue, source .hubflow/.profile"
+
+  popd
 }
 
 function build_cue {
+  local shome=$HOME
+  pushd $shome
+
   git clone https://github.com/HeSYINUvSBZfxqA/cue .cue
   logger_info "to activate cue, source .cue/.profile"
+
+  popd
 }
 
 function build_xmonad {
+  local shome=$HOME
+  pushd $shome
+
   defaults write org.macports.X11 enable_test_extensions -boolean true 
 
   if [[ "$FLAGS_clean" == "$FLAGS_TRUE" ]]; then
@@ -139,6 +177,8 @@ function build_xmonad {
   cabal install xmobar-0.13
 
   ~/.cabal/bin/xmonad --recompile
+
+  popd
 }
 
 # build the site with jekyll
