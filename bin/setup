@@ -63,7 +63,7 @@ function setup_user {
     sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared
   else
     if [[ ! -d $pth_shared/.getting-started ]]; then
-      sudo su - $name_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/getting-started .getting-started"
+      sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/getting-started .getting-started"
     fi
   fi
 
@@ -88,14 +88,14 @@ function setup_user {
   if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
     sudo xcode-'select' -switch /Applications/Xcode.app
     if [[ ! -d $pth_shared/.macports ]]; then
-      sudo su - $name_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/macports .macports"
+      sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/macports .macports"
     fi
     sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build macports"
   fi
 
   if [[ "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
     if [[ ! -d $pth_shared/.ubuntu ]]; then
-      sudo su - $name_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/ubuntu .ubuntu"
+      sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/ubuntu .ubuntu"
     fi
     sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build ubuntu"
   fi
