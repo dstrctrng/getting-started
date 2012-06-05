@@ -80,7 +80,7 @@ function setup_user {
 
   if [[ -d $pth_shared/.git ]]; then
     sudo su - $nm_shared -c "git pull"
-    sudo su - $nm_shared -c "git submodule update --init"
+    sudo su - $nm_shared -c "git submodule update --init --recursive"
   else
     sudo su - $nm_shared -c "cd .getting-started; git pull origin master"
   fi
