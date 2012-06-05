@@ -58,7 +58,7 @@ function setup_pancake {
 
   osx_useradd $nm_shared "$FLAGS_userid"
 
-  if [[ ! -d $pth_shared/.git ]]; then
+  if [[ ! -d $pth_shared/.git && -n "$FLAGS_repo" ]]; then
     sudo git clone --recurse-submodules "$FLAGS_repo" $pth_shared
   fi
 
@@ -66,24 +66,36 @@ function setup_pancake {
     sudo ln -nfs $pth_shared/.macports /opt
   fi
 
-  if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
+  if [[ "$FLAGS_macports" = "$FLAGS_TRUE" || "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
     sudo rsync -ia --no-group --no-owner --delete vault/. $pth_shared/vault/
   fi
 
   sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared
 
-  sudo su - $nm_shared -c "git pull"
-  sudo su - $nm_shared -c "git submodule update --init --recursive"
+  if [[ ! -d $pth_shared/.git ]]; then
+    sudo su - $nm_shared -c "git pull"
+    sudo su - $nm_shared -c "git submodule update --init --recursive"
+  fi
 
   if [[ "$FLAGS_macports" = "$FLAGS_TRUE" ]]; then
     sudo xcode-'select' -switch /Applications/Xcode.app
     sudo su - $nm_shared -c "bin/build pancake"
   fi
+
+  if [[ "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
+    sudo su - $nm_shared -c "source .bash_profile; bin/build ubuntu"
+  fi
+
+  if [[ "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
+    sudo su - $nm_shared -c "source .bash_profile; bin/build ruby"
+  fi
 }
 
 # define command line options:
 #   var name, default, description, short option
-DEFINE_boolean 'macports' "$FLAGS_TRUE" 'install macports packages' 'm'
+DEFINE_boolean 'macports' "$FLAGS_FALSE" 'install macports packages' 'm'
+DEFINE_boolean 'ubuntu' "$FLAGS_FALSE" 'install ubuntu guests' 'U'
+DEFINE_boolean 'ruby' "$FLAGS_FALSE" 'install rvm rubies' 'R'
 DEFINE_integer 'userid' "502" 'user id' 'u'
 DEFINE_integer 'groupid' "20" 'group id' 'g'
 DEFINE_string 'repo' "https://github.com/HeSYINUvSBZfxqA/pancake-normal" 'home repo' 'r'
