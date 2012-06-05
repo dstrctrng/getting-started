@@ -67,6 +67,7 @@ function build_macports {
   bin/setup macports
   bin/build macports
   bin/build ports
+  gem install bundler
 
   popd
 }
