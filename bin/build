@@ -79,6 +79,8 @@ function build_ubuntu {
   ln -nfs $shome/vault $shome/.ubuntu/
 
   cd $shome/.ubuntu
+  # put this into a bin/ command
+  bundle --local --path vendor/bundle
   bundle exec vagrant box add destructuring boxes/destructuring.box || true # TODO
   bin/instance --ip 192.168.88.101 dev1 destructuring
 
