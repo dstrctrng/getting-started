@@ -1,3 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
+[[ -d ~/.getting-started ]] || git clone https://github.com/HeSYINUvSBZfxqA/getting-started ~/.getting-started
 exec ~/.getting-started/bin/pancake "$@"
