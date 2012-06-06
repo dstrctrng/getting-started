@@ -1,0 +1,4 @@
+    bin/setup -m    -u 502 user zendesk
+    bin/setup -U    -u 503 user vagrant
+    bin/setup       -u 504 user buddhy
+    bin/setup -r '' -u 505 user zenguest
