@@ -195,6 +195,8 @@ function build_jekyll {
 
 # define command line options:
 #   var name, default, description, short option
+DEFINE_boolean "clean" "$FLAGS_clean" "removes rvm first" "c"
+DEFINE_boolean "update" "$FLAGS_update" "reinstalls rvm rubies" "R"
 
 # parse the command-line
 parse_command_line "$@" || exit $?
