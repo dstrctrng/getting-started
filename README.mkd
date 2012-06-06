@@ -14,7 +14,7 @@ Source pancake in your .bashrc:
 This bootstrap is in your $PATH and knows how to executes scripts in
 your $HOME getting-started repo:
 
-    pancake setup -m    -u 502 user zendesk
-    pancake setup -U    -u 503 user vagrant
-    pancake setup       -u 504 user buddhy
-    pancake setup -r '' -u 505 user zenguest
+    pancake user zendesk
+    pancake user vagrant
+    pancake user buddhy
+    pancake user zenguest
