@@ -7,6 +7,10 @@ available:
 
     rsync -ia ~/.getting-started/bin/pancake-bootstrap /usr/local/bin/pancake
 
+Source pancake in your .bashrc:
+
+    eval "$(~/.getting-started/bin/pancake init)" 
+    
 This bootstrap is in your $PATH and knows how to executes scripts in
 your $HOME getting-started repo:
 
