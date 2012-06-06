@@ -131,7 +131,9 @@ function build_junas {
   pushd $shome
 
   git clone https://github.com/HeSYINUvSBZfxqA/junas .junas
-  logger_info "to activate junas, symlink .vim to .junas, copy .junas/vimrc.example to .vimrc"
+  ln -nfs .junas .vim
+  cp .junas/.vimrc.example .vimrc
+  vim -E -c ':source .vimrc' -c :quit meh
 
   popd
 }
@@ -147,11 +149,14 @@ function build_hubflow {
 }
 
 function build_cue {
+  local old_shome="$shome"
   local shome=$HOME
   pushd $shome
 
   git clone https://github.com/HeSYINUvSBZfxqA/cue .cue
-  logger_info "to activate cue, source .cue/.profile"
+  source ".cue/.profile"
+  cd "$old_shome"
+  exec bash
 
   popd
 }
