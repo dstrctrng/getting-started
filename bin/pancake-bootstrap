@@ -1,4 +1,5 @@
 #!/bin/bash
 
 [[ -d ~/.getting-started ]] || git clone https://github.com/HeSYINUvSBZfxqA/getting-started ~/.getting-started
+[[ -f ~/.getting-started/bin/pancake ]] || { cd ~/.getting-started && git pull origin master; }
 exec ~/.getting-started/bin/pancake "$@"
