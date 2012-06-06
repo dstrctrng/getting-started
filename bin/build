@@ -120,7 +120,7 @@ function build_rbenv {
   local shome=$HOME
   pushd $shome
 
-  git clone https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
 
   popd
 }
@@ -129,7 +129,7 @@ function build_junas {
   local shome=$HOME
   pushd $shome
 
-  git clone https://github.com/HeSYINUvSBZfxqA/junas .junas
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/junas .junas
   ln -nfs .junas .vim
   cp .junas/.vimrc.example .vimrc
   vim -E -c ':source .vimrc' -c :quit meh
@@ -141,7 +141,7 @@ function build_hubflow {
   local shome=$HOME
   pushd $shome
 
-  git clone https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
 
   popd
 }
@@ -149,7 +149,7 @@ function build_hubflow {
 function build_cue {
   pushd $shome
 
-  git clone https://github.com/HeSYINUvSBZfxqA/cue .cue
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/cue .cue
   source ".cue/.profile"
 
   popd
