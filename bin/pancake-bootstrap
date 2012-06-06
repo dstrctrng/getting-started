@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+exec ~/.getting-started/bin/pancake "$@"
