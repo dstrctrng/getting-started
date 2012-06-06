@@ -1,4 +1,11 @@
-    bin/setup -m    -u 502 user zendesk
-    bin/setup -U    -u 503 user vagrant
-    bin/setup       -u 504 user buddhy
-    bin/setup -r '' -u 505 user zenguest
+Copy the pancake bootstrap to a global location:
+
+    rsync -ia .getting-started/bin/pancake-bootstrap /usr/local/bin/pancake
+
+This bootstrap is in your $PATH and knows how to executes scripts in
+your $HOME getting-started repo:
+
+    pancake setup -m    -u 502 user zendesk
+    pancake setup -U    -u 503 user vagrant
+    pancake setup       -u 504 user buddhy
+    pancake setup -r '' -u 505 user zenguest
