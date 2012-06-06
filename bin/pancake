@@ -11,22 +11,28 @@ function main {
   case "$nm_component" in
     init)
       cat <<EOF
-      [[ -f /opt/.profile ]] && source /opt/.profile;
+      if [[ -f /opt/.profile ]]; then source /opt/.profile; fi;
+
       pushd ~ > /dev/null;
-      [[ -f .hubflow/.profile ]] && source .hubflow/.profile;
-      [[ -d .rvm ]] && { source .rvm/scripts/rvm; rvm default; };
-      [[ -f .rbenv/.profile ]] && source .rbenv/.profile;
+
+      if [[ -f .hubflow/.profile ]]; then source .hubflow/.profile; fi;
+      if [[ -d .rvm ]];              then source .rvm/scripts/rvm; 
+                                          rvm default; fi;
+      if [[ -f .rbenv/.profile ]];   then source .rbenv/.profile; fi
+
       popd > /dev/null;
 EOF
+      echo 'PATH="$HOME/.getting-started/bootstrap:$PATH"'
       ;;
     shell)
-      source <($0 init)
-      PATH="$HOME/.getting-started/bootstrap:$PATH"
+      eval "$($0 init)"
+      local bash_opt=""
+
       if [[ -f ~/.cue/.profile ]]; then
-        exec bash --init-file ~/.cue/.profile -i
-      else
-        exec bash -i
+        bash_opt="--init-file $HOME/.cue/.profile"
       fi
+
+      exec bash $bash_opt -i
       ;;
     *)
       cd "$HOME/.getting-started"
