@@ -27,13 +27,9 @@ EOF
         exec bash -i
       fi
       ;;
-    setup|build)
+    *)
       cd "$HOME/.getting-started"
       bin/$nm_component "$@"
-      ;;
-    *)
-      echo "not a pancake subcommand: $nm_component"
-      exit 1
       ;;
   esac
 }
