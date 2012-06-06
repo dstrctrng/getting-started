@@ -46,6 +46,7 @@ function osx_useradd {
   sudo dscl . -create $pth_user NFSHomeDirectory $pth_user
   sudo dscl . -passwd $pth_user buddhy
   sudo mkdir -p $pth_user
+  sudo chown $nm_user:$FLAGS_groupid $pth_user
 }
 
 function setup_user {
