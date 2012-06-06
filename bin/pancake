@@ -27,13 +27,9 @@ EOF
         exec bash -i
       fi
       ;;
-    user)
+    setup|build)
       cd "$HOME/.getting-started"
-      bin/setup "$@"
-      ;;
-    build)
-      cd "$HOME/.getting-started"
-      bin/build "$@"
+      bin/$nm_component "$@"
       ;;
     *)
       echo "not a pancake subcommand: $nm_component"
