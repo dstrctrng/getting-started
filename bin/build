@@ -121,7 +121,6 @@ function build_rbenv {
   pushd $shome
 
   git clone https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
-  logger_info "to activate cue, source .rbenv/.profile, after rvm if used"
 
   popd
 }
@@ -143,20 +142,15 @@ function build_hubflow {
   pushd $shome
 
   git clone https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
-  logger_info "to activate cue, source .hubflow/.profile"
 
   popd
 }
 
 function build_cue {
-  local old_shome="$shome"
-  local shome=$HOME
   pushd $shome
 
   git clone https://github.com/HeSYINUvSBZfxqA/cue .cue
   source ".cue/.profile"
-  cd "$old_shome"
-  exec bash
 
   popd
 }
