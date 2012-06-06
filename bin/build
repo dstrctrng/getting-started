@@ -88,9 +88,6 @@ function build_ubuntu {
 }
 
 function build_ruby {
-  local shome=$HOME
-  pushd $shome
-
   export CFLAGS="-O2 -arch x86_64"
   export LDFLAGS="-L$MACPORTS_ROOT/local/lib"
   export CPPFLAGS="-I$MACPORTS_ROOT/local/include"
@@ -117,8 +114,6 @@ function build_ruby {
   unset CC
 
   $shome/bin/rvm-run rvm ree --default
-
-  popd
 }
 
 function build_rbenv {
