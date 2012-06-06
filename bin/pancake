@@ -31,6 +31,26 @@ EOF
 
       exec bash $bash_opt -i
       ;;
+    user)
+      cd "$HOME/.getting-started"
+      case "$1" in
+        zendesk)
+          $0 setup -m -u 502 user zendesk
+          ;;
+        vagrant)
+          pancake setup -U -u 503 user vagrant
+          ;;
+        buddhy)
+          pancake setup -u 504 user buddhy
+          ;;
+        zenguest)
+          pancake setup -r '' -u 505 user zenguest
+          ;;
+        *)
+          false
+          ;;
+        esac
+      ;;
     *)
       cd "$HOME/.getting-started"
       bin/$nm_component "$@"
