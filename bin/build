@@ -121,6 +121,7 @@ function build_rbenv {
   pushd $shome
 
   git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
+  logger_info "put this into your .bash_profile, after rvm if applicable: source .rbenv/.profile"
 
   popd
 }
@@ -142,15 +143,17 @@ function build_hubflow {
   pushd $shome
 
   git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
+  logger_info "put this into your .bash_profile: source .hubflow/.profile"
 
   popd
 }
 
 function build_cue {
+  local shome=$HOME
   pushd $shome
 
   git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/cue .cue
-  source ".cue/.profile"
+  logger_info "put this into your .bash_profile: source .cue/.profile"
 
   popd
 }
