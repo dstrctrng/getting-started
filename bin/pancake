@@ -21,6 +21,7 @@ EOF
       ;;
     shell)
       eval $($0 init)
+      PATH="$HOME/.getting-started/bootstrap:$PATH"
       if [[ -f ~/.cue/.profile ]]; then
         exec bash --init-file ~/.cue/.profile -i
       else
