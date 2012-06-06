@@ -1,6 +1,11 @@
-Copy the pancake bootstrap to a global location:
+Initialize getting-started into your $HOME:
 
-    rsync -ia .getting-started/bin/pancake-bootstrap /usr/local/bin/pancake
+    bash <(curl -s https://raw.github.com/HeSYINUvSBZfxqA/getting-started/master/bin/pancake-bootstrap) shell
+
+Copy the pancake bootstrap to a global location to make it generally
+available:
+
+    rsync -ia ~/.getting-started/bin/pancake-bootstrap /usr/local/bin/pancake
 
 This bootstrap is in your $PATH and knows how to executes scripts in
 your $HOME getting-started repo:
