@@ -78,7 +78,7 @@ function setup_user {
   fi
 
   if [[ "$FLAGS_macports" = "$FLAGS_TRUE" || "$FLAGS_ubuntu" = "$FLAGS_TRUE" ]]; then
-    sudo rsync -ia --no-group --no-owner --delete vault/. $pth_shared/vault/
+    sudo rsync -ia --no-group --no-owner --delete $shomne/vault/. $pth_shared/vault/
     sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared/vault/
   fi
 
