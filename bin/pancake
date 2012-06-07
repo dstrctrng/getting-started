@@ -1,5 +1,20 @@
 #!/bin/bash
 
+#/ NAME
+#/     pancake -- text ui for pancake
+#/
+#/ SYNOPSIS
+#/     pancake shell
+#/     pancake user XXX
+#/     pancake setup|build
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
 function main {
   if [[ "$#" < 1 ]]; then
     echo "missing pancake subcommand"
@@ -23,28 +38,27 @@ function main {
 
       popd > /dev/null;
 EOF
-      echo 'PATH="$HOME/.getting-started/bootstrap:$PATH"'
+      echo "PATH=$shome/.getting-started/bootstrap:"'$PATH'
       ;;
     shell)
-      eval "$($0 init)"
-      local bash_opt=""
-
-      exec bash $bash_opt -i
+      local tmp_init="$(mktemp -t XXXXXXXXX)"
+      $shome/bin/pancake init > "$tmp_init"
+      export _TMP_INIT="$tmp_init"
+      exec bash --init-file "$shome/bootstrap/_init" -i
       ;;
     user)
-      cd "$HOME/.getting-started"
       case "$1" in
         zendesk)
-          $0 setup -m -u 502 user zendesk
+          $shome/bin/pancake setup -m -u 502 user zendesk
           ;;
         vagrant)
-          pancake setup -U -u 503 user vagrant
+          $shome/bin/pancake setup -U -u 503 user vagrant
           ;;
         buddhy)
-          pancake setup -u 504 user buddhy
+          $shome/bin/pancake setup -u 504 user buddhy
           ;;
         zenguest)
-          pancake setup -r '' -u 505 user zenguest
+          $shome/bin/pancake setup -r '' -u 505 user zenguest
           ;;
         *)
           false
@@ -52,11 +66,17 @@ EOF
         esac
       ;;
     *)
-      cd "$HOME/.getting-started"
-      bin/$nm_component "$@"
+      $shome/bin/$nm_component "$@"
       ;;
   esac
 }
+
+# define command line options:
+#   var name, default, description, short option
+
+# parse the command-line
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
 
 # pass arguments to entry point
 main "$@"

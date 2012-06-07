@@ -1,0 +1,7 @@
+if [[ -f "$HOME/.bash_profile" ]]; then
+  source "$HOME/.bash_profile"
+fi
+
+source "$_TMP_INIT"
+rm -f "$_TMP_INIT"
+unset _TMP_INIT
