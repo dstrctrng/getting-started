@@ -46,7 +46,7 @@ EOF
       exec bash --init-file "$shome/bootstrap/_init" -i
       ;;
     dev?)
-      sudo su - vagrant -c "v $nm_component $@"
+      sudo su - vagrant -c "source .bash_profile; v $nm_component $@"
       ;;
     user)
       case "$1" in
