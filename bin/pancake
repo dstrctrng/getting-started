@@ -51,16 +51,16 @@ EOF
     user)
       case "$1" in
         zendesk)
-          $shome/bin/pancake setup -m -u 502 user zendesk
+          $shome/bin/pancake -- setup -m -u 502 user zendesk
           ;;
         vagrant)
-          $shome/bin/pancake setup -U -u 503 user vagrant
+          $shome/bin/pancake -- setup -U -u 503 user vagrant
           ;;
         buddhy)
-          $shome/bin/pancake setup -u 504 user buddhy
+          $shome/bin/pancake -- setup -u 504 user buddhy
           ;;
         zenguest)
-          $shome/bin/pancake setup -r '' -u 505 user zenguest
+          $shome/bin/pancake -- setup -r '' -u 505 user zenguest
           ;;
         *)
           false
