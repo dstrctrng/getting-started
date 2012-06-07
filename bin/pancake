@@ -51,7 +51,7 @@ EOF
       ;;
     update)
       cd "$shome"
-      git pull origin update
+      git pull origin master
       git submodule update --init --recursive
       ;;
     user)
