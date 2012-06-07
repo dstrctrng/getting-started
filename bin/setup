@@ -64,10 +64,12 @@ function setup_user {
   if [[ ! -d $pth_shared/.git && -n "$FLAGS_repo" ]]; then
     sudo git clone --recurse-submodules "$FLAGS_repo" $pth_shared
     sudo chown -R $nm_shared:$FLAGS_groupid $pth_shared
+    sudo su - $nm_shared -c "git pull origin master && git submodules update --init --recursive"
   else
     if [[ ! -d $pth_shared/.getting-started ]]; then
       sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/getting-started .getting-started"
     fi
+    sudo su - $nm_shared -c "cd .getting-started && git pull origin master && git submodules update --init --recursive"
   fi
 
 
@@ -93,6 +95,7 @@ function setup_user {
     if [[ ! -d $pth_shared/.macports ]]; then
       sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/macports .macports"
     fi
+    sudo su - $nm_shared -c "cd .macports && git pull origin master && git submodules update --init --recursive"
     sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build macports"
   fi
 
@@ -100,6 +103,7 @@ function setup_user {
     if [[ ! -d $pth_shared/.ubuntu ]]; then
       sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/ubuntu .ubuntu"
     fi
+    sudo su - $nm_shared -c "cd .ubuntu && git pull origin master && git submodules update --init --recursive"
     sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build ubuntu"
   fi
 
