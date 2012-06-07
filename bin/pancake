@@ -7,6 +7,7 @@
 #/     pancake shell
 #/     pancake user XXX
 #/     pancake setup|build
+#/     pancake update
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
@@ -37,7 +38,7 @@ function main {
 
       popd > /dev/null;
 EOF
-      echo "PATH=$shome/.getting-started/bootstrap:"'$PATH'
+      echo "PATH=$shome/bootstrap:"'$PATH'
       ;;
     shell)
       local tmp_init="$(mktemp -t XXXXXXXXX)"
@@ -47,6 +48,11 @@ EOF
       ;;
     dev?)
       sudo su - vagrant -c "source .bash_profile; v $nm_component $@"
+      ;;
+    update)
+      cd "$shome"
+      git pull origin update
+      git submodule update --init --recursive
       ;;
     user)
       case "$1" in
