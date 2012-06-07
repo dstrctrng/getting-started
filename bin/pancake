@@ -26,15 +26,14 @@ function main {
   case "$nm_component" in
     init)
       cat <<EOF
-      if [[ -f /opt/.profile ]]; then source /opt/.profile; fi;
-
       pushd ~ > /dev/null;
 
-      if [[ -f .hubflow/.profile ]]; then source .hubflow/.profile; fi;
-      if [[ -d .rvm ]];              then source .rvm/scripts/rvm; 
-                                          rvm default; fi;
+      if [[ -f /opt/.profile ]];     then source /opt/.profile; fi;
+      if [[ -d .rvm ]];              then source .rvm/scripts/rvm; rvm default; fi;
       if [[ -f .rbenv/.profile ]];   then source .rbenv/.profile; fi
+      if [[ -f .hubflow/.profile ]]; then source .hubflow/.profile; fi;
       if [[ -f .cue/.profile ]];     then source .cue/.profile; fi
+      if [[ -f .ubuntu/.profile ]];  then source .ubuntu/.profile; fi
 
       popd > /dev/null;
 EOF
@@ -45,6 +44,9 @@ EOF
       $shome/bin/pancake init > "$tmp_init"
       export _TMP_INIT="$tmp_init"
       exec bash --init-file "$shome/bootstrap/_init" -i
+      ;;
+    dev?)
+      sudo su - vagrant -c "v $nm_component $@"
       ;;
     user)
       case "$1" in
