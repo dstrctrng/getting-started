@@ -104,7 +104,7 @@ function setup_user {
       sudo su - $nm_shared -c "git clone https://github.com/HeSYINUvSBZfxqA/ubuntu .ubuntu"
     fi
     sudo su - $nm_shared -c "cd .ubuntu && git pull origin master && git submodule update --init --recursive"
-    sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build ubuntu"
+    sudo su - $nm_shared -c "source .bash_profile; cd .getting-started; bin/build --box "$FLAGS_box" ubuntu"
   fi
 
   if [[ "$FLAGS_ruby" = "$FLAGS_TRUE" ]]; then
@@ -116,6 +116,7 @@ function setup_user {
 #   var name, default, description, short option
 DEFINE_boolean 'macports' "$FLAGS_FALSE" 'install macports packages' 'm'
 DEFINE_boolean 'ubuntu' "$FLAGS_FALSE" 'install ubuntu guests' 'U'
+DEFINE_string 'box' "destructuring" 'vagrant box' 'b'
 DEFINE_boolean 'ruby' "$FLAGS_FALSE" 'install rvm rubies' 'R'
 DEFINE_integer 'userid' "502" 'user id' 'u'
 DEFINE_integer 'groupid' "20" 'group id' 'g'

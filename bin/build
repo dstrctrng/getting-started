@@ -79,10 +79,7 @@ function build_ubuntu {
   ln -nfs $shome/vault $shome/.ubuntu/
 
   cd $shome/.ubuntu
-  # put this into a bin/ command
-  bundle --local --path vendor/bundle
-  bundle exec vagrant box add destructuring boxes/destructuring.box || true # TODO
-  bin/instance --ip 192.168.88.101 dev1 destructuring
+  bin/instance --reconfig --ip 192.168.88.101 dev1 "$FLAGS_box"
 
   popd
 }
@@ -194,6 +191,7 @@ function build_jekyll {
 #   var name, default, description, short option
 DEFINE_boolean "clean" "$FLAGS_FALSE" "removes rvm first" "c"
 DEFINE_boolean "update" "$FLAGS_FALSE" "reinstalls rvm rubies" "R"
+DEFINE_boolean "box" "destructuring" "vagrant box" "b"
 
 # parse the command-line
 parse_command_line "$@" || exit $?

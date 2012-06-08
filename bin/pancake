@@ -60,7 +60,7 @@ EOF
           $shome/bin/pancake -- setup -m -u 502 user zendesk
           ;;
         vagrant)
-          $shome/bin/pancake -- setup -U -u 503 user vagrant
+          $shome/bin/pancake -- setup -U -b zendesk -u 503 user vagrant
           ;;
         buddhy)
           $shome/bin/pancake -- setup -u 504 user buddhy
