@@ -85,9 +85,11 @@ function build_ubuntu {
 }
 
 function build_ruby {
-  export CFLAGS="-O2 -arch x86_64"
-  export LDFLAGS="-L$MACPORTS_ROOT/local/lib"
-  export CPPFLAGS="-I$MACPORTS_ROOT/local/include"
+  if [[ -n "$MACPORTS_ROOT" ]]; then
+    export CFLAGS="-O2 -arch x86_64"
+    export LDFLAGS="-L$MACPORTS_ROOT/local/lib"
+    export CPPFLAGS="-I$MACPORTS_ROOT/local/include"
+  fi
   
   if [[ "$FLAGS_clean" == "$FLAGS_TRUE" ]]; then
     if [[ -d "$HOME/.rvm" ]]; then
@@ -103,12 +105,21 @@ function build_ruby {
     install_cmd="install"
   fi
 
-  $shome/bin/rvm-run rvm $install_cmd ree --with-openssl-dir=$MACPORTS_ROOT/local
   $shome/bin/rvm-run rvm $install_cmd jruby
 
-  export CC="$MACPORTS_ROOT/local/bin/gcc"
-  $shome/bin/rvm-run rvm $install_cmd 1.9.3 --with-opt-dir=$MACPORTS_ROOT/local
-  unset CC
+  if [[ -z "$MACPORTS_ROOT" ]]; then
+    $shome/bin/rvm-run rvm $install_cmd ree
+  else
+    $shome/bin/rvm-run rvm $install_cmd ree --with-openssl-dir=$MACPORTS_ROOT/local
+  fi
+
+  if [[ -z "$MACPORTS_ROOT" ]]; then
+    $shome/bin/rvm-run rvm $install_cmd 1.9.3
+  else
+    export CC="$MACPORTS_ROOT/local/bin/gcc"
+    $shome/bin/rvm-run rvm $install_cmd 1.9.3 --with-opt-dir=$MACPORTS_ROOT/local
+    unset CC
+  fi
 
   $shome/bin/rvm-run rvm ree --default
 }
