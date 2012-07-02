@@ -1,0 +1,9 @@
+Host *
+  ControlPath ~/.ssh/deploy-master-%r@%h:%p
+  ForwardAgent yes
+  ForwardX11 no
+  UserKnownHostsFile ~/.getting-started/ssh/known_hosts
+  StrictHostKeyChecking yes
+
+Host deploy
+  Port 22

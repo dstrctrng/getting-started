@@ -5,9 +5,10 @@
 #/
 #/ SYNOPSIS
 #/     pancake shell
-#/     pancake user XXX
-#/     pancake setup|build
 #/     pancake update
+#/     pancake dev1|dev2|dev3|dev4
+#/     pancake user pancake|vagrant
+#/     pancake init
 
 # figure out the project root under which bin, lib live
 shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
@@ -26,18 +27,8 @@ function main {
 
   case "$nm_component" in
     init)
-      cat <<EOF
-      pushd ~ > /dev/null;
-
-      if [[ -f /opt/.profile ]];     then source /opt/.profile; fi;
-      if [[ -d .rvm ]];              then source .rvm/scripts/rvm; rvm default; fi;
-      if [[ -f .rbenv/.profile ]];   then source .rbenv/.profile; fi
-      if [[ -f .hubflow/.profile ]]; then source .hubflow/.profile; fi;
-      if [[ -f .cue/.profile ]];     then source .cue/.profile; fi
-      if [[ -f .ubuntu/.profile ]];  then source .ubuntu/.profile; fi
-
-      popd > /dev/null;
-EOF
+      cat "$shome/config/bash.example"
+      echo "eval "'"$'"($shome/bin/agent init)"'"'
       echo "PATH=$shome/bootstrap:"'$PATH'
       ;;
     shell)
@@ -47,26 +38,24 @@ EOF
       exec bash --init-file "$shome/bootstrap/_init" -i
       ;;
     dev?)
-      sudo su - vagrant -c "source .bash_profile; v $nm_component $@"
+      if [[ -d "$HOME/.ubuntu/vagrant/$nm_component" ]]; then
+        $HOME/.ubuntu/bin/vagrant -- "$nm_component" "$@"
+      else
+        sudo su - vagrant -c "source .bash_profile; v $nm_component $@"
+      fi
       ;;
     update)
       cd "$shome"
-      git pull origin master
+      git pull
       git submodule update --init --recursive
       ;;
     user)
       case "$1" in
-        zendesk)
-          $shome/bin/pancake -- setup -m -u 502 user zendesk
+        pancake)
+          $shome/bin/setup -u 502 -m user pancake
           ;;
         vagrant)
-          $shome/bin/pancake -- setup -U -b zendesk -u 503 user vagrant
-          ;;
-        buddhy)
-          $shome/bin/pancake -- setup -u 504 user buddhy
-          ;;
-        zenguest)
-          $shome/bin/pancake -- setup -r '' -u 505 user zenguest
+          $shome/bin/setup -u 503 -U -b vagrant user vagrant
           ;;
         *)
           false

@@ -2,53 +2,72 @@
 layout: guide
 title: Getting Started
 ---
+# Getting Started
 
-## OS X setup
+tl;dr getting-started makes your deploys faster and easier.
 
- - OS X Lion 10.7.x
- - XCode 4.3.2+ with command line tools from the Apple App Store
- - [Git](http://code.google.com/p/git-osx-installer/) OS X installer
- - [VirtualBox](https://www.virtualbox.org/wiki/Downloads) with extensions 
- - OS X [Java](http://support.apple.com/kb/DL1515) for jruby
+getting-started project is a common configuration and script library for
+access to production and integration environments.  If you access
+servers to deploy applications, debug services, run
+migrations/tasks, and want your workstation compatible with the ever
+changing security, audit, toolchain, configuration that is Operations,
+please follow the instructions in this README.
 
-## Project setup
+This procedure has been tested on OS X workstations.  Ubuntu workstation
+support is coming.
 
- - Download XCode free from the App Store.
-  - Install command line tools from the menu XCode > Preferences > Downloads
+## Cloning the getting-started repo
 
- - Clone the getting-started project.  For this project we will use ~/work.  In
-   a terminal
-        
-        mkdir -p ~/work
-        cd ~/work
-        git clone git://github.com:HeSYINUvSBZfxqA/getting-started.git
+Initialize getting-started into your $HOME on your workstation.  Do not
+clone this project in production/shared environments since its presence enables
+autoconf, autoproxy, and autocache capabilities that are not necessary
+once you are in production.
 
- - Copy `vault_installer`.  Your origin and destination may vary from
-   this example.
+    git clone https://github.com/HeSYINUvSBZfxqA/getting-started ~/.getting-started
 
-        rsync -ia /Dropbox/vault/. /Volume/vault_installer/
+To receive updates, use the `bin/pancake` script.
 
- - Symlink `/Volume/vault_installer` to `~/work/getting-started/vault`
+    ~/.getting-started/bin/pancake update
 
-        ln -nfs /Volume/vault_installer ~/work/getting-started/vault
+## Test deploy
 
- - Run: bin/setup user XXX
+The getting-started project is deployable and is a good indicator your
+computer is set up correctly.
 
-        cd ~/work/getting-started
-        bin/setup user XXX
+Using rvm and ruby ree, deploy getting-started to the master
+environment:
 
- - You should see a new shell prompt.  This new shell prompts shows you
-   your current directory, current user logged inand machine connected to, github
-   your current directory, current user and machine connected to, github
+    cd ~/.getting-started
+    bin/deploy master
 
- - Installing ruby version manager with jruby, ruby enterprise edition
-   1.8.7-2012.02, ruby-1.8.7-p358, ruby-1.9.3-p194.  This will take a
-while to download and compile.
+You can also run the `hello` task remotely to verify you can run
+commands remotely:
 
-        bin/build ruby
+    bin/task hello master
 
- - Double check installed rubies, gem version, and rvm version
+## Configuring ssh
 
-        rvm -v
-        gem -v
-        rvm list
+Append the contents of ~/.getting-started/ssh/config.example to your
+~/.ssh/config to expose the hostname aliases for ssh, scp based commands
+(like rsync).
+
+## Generate documentation
+
+This README (and more, soon) is available as a static jekyll site in in
+`site/`.  To build it, use the `bin/build` command:
+
+    bin/build site
+
+The static site is generated in `site/_site`.  The start page is in
+getting-started project root at `index.html`.  It's meant to be both
+hosted on a web server and directly viewable from a folder.
+
+## TODO
+
+Need to cover
+
+ * OS X packages (macports)
+ * Ubuntu workstation packages
+ * VirtualBox guests (dev1, dev2)
+ * ssh and gpg key management
+ * private gem repository

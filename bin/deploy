@@ -1,0 +1,327 @@
+#!/bin/bash
+
+#/ NAME
+#/     deploy -- central script for alpha_omega commands
+#/     build -- builds pancake components
+#/           -- builds static site using jekyll
+#/           -- upload the latest (timestamp) rubygem to rubygems.org
+#/
+#/ SYNOPSIS
+#/     build macports|ruby|cue|rbenv|junas|hubflow
+#/     build dev1|dev2|dev3|dev4
+#/     build site
+#/     build gem -n gem_name
+#/     
+#/     deploy
+#/     stage
+#/     activate
+#/     restart
+#/     rollback
+#/     release
+#/
+#/     bump 
+#/         major|minor|patch
+#/         [1.2.3]
+#/         * without arguments, defaults to patch 
+#/     migrate 
+#/         list | [data|pre|during|post]
+#/         [YYYYMMDDHHMMSS]
+#/         [any_task]
+#/     compare
+#/
+#/     repl [host]
+#/
+#/     check
+#/     plan
+#/
+#/     hosts
+#/         [group] | [host]
+#/         all | world
+#/     dna
+#/     shell
+#/     invoke
+#/         [command_and_args]
+#/     debug
+#/
+#/     lock
+#/         compare|migrate
+#/     unlock
+#/         compare|migrate
+#/
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
+function main {
+  if [[ "$#" == 0 ]]; then
+    logger_fatal "need at least one argument"
+    exit 1
+  fi
+
+  local nm_component="$1"; shift
+  case "$nm_component" in 
+    macports)
+      build_${nm_component}
+      ;;
+    dev?)
+      build_ubuntu "$nm_component"
+      ;;
+    ruby)
+      build_${nm_component}
+      ;;
+     rbenv)
+      build_${nm_component}
+      ;;
+    junas)
+      build_${nm_component}
+      ;;
+    hubflow)
+      build_${nm_component}
+      ;;
+    cue)
+      build_${nm_component}
+      ;;
+    xmonad)
+      build_${nm_component}
+      ;;
+    site)
+      build_jekyll "$@"
+      ;;
+    gem)
+      build_gem "$@"
+      ;;
+    *)
+      export BUNDLE_GEMFILE="$shome/.deploy/Gemfile"
+
+      bundle check 2>&1 >/dev/null || { bundle install --quiet --local --path vendor/bundle || bundle check > /dev/null; }
+
+      if [[ "$FLAGS_autoconf" = "$FLAGS_TRUE" ]]; then
+        PATH="$shome/.deploy/ssh/bin:$PATH"
+      fi
+
+      if [[ -n "$FLAGS_gateway" ]]; then
+        export GATEWAY="$FLAGS_gateway"
+      fi
+
+      if [[ -n "$FLAGS_chef" ]]; then
+        export CHEF_PATH="$(cd -P -- "$FLAGS_chef" && pwd -P)"
+      fi
+
+      if [[ -d "$HOME/.getting-started/.git" ]]; then
+        FLAGS_proxy="$FLAGS_TRUE"
+      fi
+
+      if [[ "$FLAGS_proxy" = "$FLAGS_FALSE" || "$FLAGS_direct" = "$FLAGS_TRUE" ]]; then
+        exec bundle exec alpha_omega $(basename $0) "$nm_component" "$@"
+      else
+        exec $shome/bin/proxy "$FLAGS_gateway" $(basename $0) "$nm_component" "$@"
+      fi
+      exit 1
+      ;;
+  esac
+}
+
+function build_macports {
+  local shome=$HOME
+  pushd $shome
+
+  if [[ ! -d "$shome/.macports" ]]; then
+    git clone https://github.com/HeSYINUvSBZfxqA/macports $shome/.macports
+  fi
+  ln -nfs $shome/vault $shome/.macports/
+
+  cd $shome/.macports
+  bin/setup macports
+  bin/build ports
+
+  popd
+}
+
+function build_ubuntu {
+  local nm_vagrant="$1"; shift
+
+  local shome=$HOME
+  pushd $shome
+
+  if [[ ! -d "$shome/.ubuntu" ]]; then
+    git clone https://github.com/HeSYINUvSBZfxqA/ubuntu $shome/.ubuntu
+  fi
+  ln -nfs $shome/vault $shome/.ubuntu/
+
+  cd $shome/.ubuntu
+  local ip_vagrant
+  case "$nm_vagrant" in
+    dev1)
+      ip_vagrant="192.168.88.101"
+      ;;
+    dev2)
+      ip_vagrant="192.168.88.102"
+      ;;
+    dev3)
+      ip_vagrant="192.168.88.103"
+      ;;
+    dev4)
+      ip_vagrant="192.168.88.104"
+      ;;
+    *)
+      logger_fatal "do not know how to build $nm_vagrant"
+      exit 1
+      ;;
+  esac
+
+  bin/instance --reconfig --ip "$ip_vagrant" "$nm_vagrant" "$FLAGS_box"
+
+  popd
+}
+
+function build_ruby {
+  if [[ -n "${MACPORTS_ROOT:-}" ]]; then
+    export CFLAGS="-O2 -arch x86_64"
+    export LDFLAGS="-L$MACPORTS_ROOT/local/lib"
+    export CPPFLAGS="-I$MACPORTS_ROOT/local/include"
+    export CC="$MACPORTS_ROOT/local/bin/gcc"
+    export CXX="$MACPORTS_ROOT/local/bin/g++"
+  fi
+  
+  if [[ "$FLAGS_clean" == "$FLAGS_TRUE" ]]; then
+    rm -rf "$HOME/.rvm"
+  fi
+  
+  local ver_rvm="1.11.7"
+  if [[ "$(bash rvm --version | grep '(version)' | awk '{print $2}')" != "$ver_rvm" ]]; then
+    $shome/bin/rvm-install "$ver_rvm"
+  fi
+  
+  if [[ "$FLAGS_update" == "$FLAGS_TRUE" ]]; then
+    install_cmd="reinstall"
+  else
+    install_cmd="install"
+  fi
+
+  $shome/bin/rvm-run rvm $install_cmd jruby
+
+  if [[ -z "$MACPORTS_ROOT" ]]; then
+    $shome/bin/rvm-run rvm $install_cmd 1.9.3
+  else
+    $shome/bin/rvm-run rvm $install_cmd 1.9.3 --with-opt-dir=$MACPORTS_ROOT/local
+  fi
+
+  local old_path="$PATH"
+  PATH="/usr/bin:$PATH"
+  if [[ -z "$MACPORTS_ROOT" ]]; then
+    $shome/bin/rvm-run rvm $install_cmd ree
+  else
+    $shome/bin/rvm-run rvm $install_cmd ree --with-openssl-dir=$MACPORTS_ROOT/local
+  fi
+  PATH="$old_path"
+}
+
+function build_rbenv {
+  local shome=$HOME
+  pushd $shome
+
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/rbenv .rbenv
+  logger_info "put this into your .bash_profile, after rvm if applicable: source .rbenv/.profile"
+
+  popd
+}
+
+function build_junas {
+  local shome=$HOME
+  pushd $shome
+
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/junas .junas
+  ln -nfs .junas .vim
+  cp .junas/.vimrc.example .vimrc
+  vim -E -c ':source .vimrc' -c :quit meh
+
+  popd
+}
+
+function build_hubflow {
+  local shome=$HOME
+  pushd $shome
+
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/hubflow .hubflow
+  logger_info "put this into your .bash_profile: source .hubflow/.profile"
+
+  popd
+}
+
+function build_cue {
+  local shome=$HOME
+  pushd $shome
+
+  git clone --recurse-submodules https://github.com/HeSYINUvSBZfxqA/cue .cue
+  logger_info "put this into your .bash_profile: source .cue/.profile"
+
+  popd
+}
+
+function build_xmonad {
+  local shome=$HOME
+  pushd $shome
+
+  defaults write org.macports.X11 enable_test_extensions -boolean true 
+
+  if [[ "$FLAGS_clean" == "$FLAGS_TRUE" ]]; then
+    rm -rf ~/.cabal ~/.ghc
+    cabal update
+  fi
+
+  if [[ "$FLAGS_update" == "$FLAGS_TRUE" ]]; then
+    cabal update
+  fi
+
+  cabal install xmonad-0.9.1
+  cabal install xmonad-contrib-0.9.1 --flags="-use_xft"
+  cabal install xmobar-0.13
+
+  ~/.cabal/bin/xmonad --recompile
+
+  popd
+}
+
+# build the site with jekyll
+function build_jekyll {
+  export BUNDLE_GEMFILE="$shome/.doc/Gemfile"
+
+  cd $shome/site
+  bundle check 2>&1 >/dev/null || { bundle install --quiet --local --path vendor/bundle || bundle check > /dev/null; }
+  bundle exec jekyll
+}
+
+# build a gem
+function build_gem {
+  pth_gemspec="$shome/$FLAGS_name.gemspec"
+  if [[ ! -e "$pth_gemspec" ]]; then
+    logger_fatal "could not find gemspec $pth_gemspec"
+    exit 1
+  fi
+
+  cd "$shome"
+  gem build "$pth_gemspec"
+}
+
+# define command line options:
+#   var name, default, description, short option
+DEFINE_string "gateway" "deploy" "deploy gateway host" "g"
+DEFINE_boolean "autoconf" "$FLAGS_TRUE" "use config/ssh to configure remote access" "z"
+DEFINE_boolean "proxy" "$FLAGS_FALSE" "use a gateway to proxy deploys" "p"
+DEFINE_boolean "direct" "$FLAGS_FALSE" "override proxy" "d"
+DEFINE_string "chef" "" "location to chef repo with opsdb" "c"
+DEFINE_boolean "clean" "$FLAGS_FALSE" "removes rvm first" "C"
+DEFINE_boolean "update" "$FLAGS_FALSE" "reinstalls rvm rubies" "R"
+DEFINE_string "box" "destructuring" "vagrant box" "b"
+DEFINE_string 'name' "$(basename "$shome")" 'name of gem' 'n'
+
+# parse the command-line
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
+# pass arguments to entry point
+main "$@"

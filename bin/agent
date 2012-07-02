@@ -1,0 +1,115 @@
+#!/bin/bash
+
+#/ NAME
+#/     agent -- manage ssh, gpg agents
+
+#/ SYNOPSIS
+#/     agent init
+#/     agent info
+#/     agent ssh-key [username] [filename]
+
+# figure out the project root under which bin, lib live
+shome="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
+
+# load a meat library
+source "$shome/bin/_prime" "$@"
+
+# entry point
+function main {
+  if [[ "$#" < 1 ]]; then
+    logger_fatal "missing agent command"
+    exit 1
+  fi
+
+  local nm_component="$1"; shift
+  case "$nm_component" in 
+    init)
+      agent_init "$@"
+      ;;
+    info)
+      agent_info "$@"
+      ;;
+    ssh-key)
+      agent_ssh_key "$@"
+      ;;
+    *)
+      logger_fatal "unrecognized agent command $nm_component"
+      exit 1
+      ;;
+  esac
+}
+
+# initialize all the agents
+function new_agent {
+  ssh-agent | egrep -v '^echo Agent pid' > ~/.ssh-agent-info
+}
+
+function show_agent {
+  cat ~/.ssh-agent-info
+}
+
+function running_agent {
+  if [[ -n "${SSH_AUTH_SOCK:-}" ]]; then
+    true
+  else
+    false
+  fi
+}
+
+function valid_agent {
+  local pth_agent="$1"; shift
+
+  if [[ -S "$pth_agent" ]]; then
+    true
+  else
+    false
+  fi
+}
+
+function agent_init {
+  if running_agent; then
+    if valid_agent "$SSH_AUTH_SOCK"; then
+      true
+    else
+      new_agent
+      show_agent
+    fi
+  else
+    new_agent
+    show_agent
+  fi
+}
+
+function agent_info {
+  if running_agent && valid_agent "$SSH_AUTH_SOCK"; then
+    echo "$SSH_AUTH_SOCK"
+    ssh-add -l
+  else
+    false
+  fi
+}
+
+function agent_ssh_key {
+  local pth_key;
+  if [[ "$#" > 0 ]]; then
+    pth_key="$1"; shift
+  else
+    pth_key="$HOME/.ssh/id_rsa"
+  fi
+
+  ssh-keygen -f "$pth_key"
+  if ! egrep -q "Proc-Type: 4,ENCRYPTED" "$pth_key"; then
+    logger_fatal "ssh-key must be protected with a password"
+    exit 1
+  fi
+}
+
+# define command line options:
+#   var name, default, description, short option
+
+# parse the command-line
+parse_command_line "$@" || exit $?
+eval set -- "${FLAGS_ARGV}"
+
+# pass arguments to entry point
+main "$@"
